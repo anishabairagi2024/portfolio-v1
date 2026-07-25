@@ -816,9 +816,18 @@ textarea:focus-visible {
   opacity: 0.75;
   cursor: wait;
 }
-.form-status { font-size: 0.85rem; min-height: 1.2em; color: var(--text-dim); }
-.form-status.success { color: #4ade80; }
-.form-status.error { color: #f87171; }
+.form-status {
+  font-size: 0.85rem;
+  min-height: 1.2em;
+  color: var(--text-dim);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.form-status.success { color: #4ade80; background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.18); }
+.form-status.error { color: #f87171; background: rgba(248, 113, 113, 0.08); border-color: rgba(248, 113, 113, 0.18); }
 
 /* ==========================================================================
    Footer

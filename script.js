@@ -196,19 +196,25 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* -------------------------------------------------
-     Contact form (client-side only demo)
+     Contact form with EmailJS
   ------------------------------------------------- */
   const form = document.getElementById('contactForm');
   const status = document.getElementById('formStatus');
   const submitButton = document.getElementById('submitButton');
 
+  if (window.emailjs) {
+    window.emailjs.init('Kky_fNhNpOvXHJyPL');
+  } else {
+    console.error('EmailJS failed to load.');
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const subject = form.subject.value.trim();
-    const message = form.message.value.trim();
+    const name = form.elements.namedItem('name').value.trim();
+    const email = form.elements.namedItem('email').value.trim();
+    const subject = form.elements.namedItem('subject').value.trim();
+    const message = form.elements.namedItem('message').value.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!name || !email || !subject || !message) {
@@ -216,8 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
       status.className = 'form-status error';
       return;
     }
+
     if (!emailPattern.test(email)) {
-      status.textContent = 'That email address doesn\u2019t look right.';
+      status.textContent = 'That email address doesn’t look right.';
       status.className = 'form-status error';
       return;
     }
@@ -228,24 +235,17 @@ document.addEventListener('DOMContentLoaded', () => {
     status.className = 'form-status';
 
     try {
-      const response = await fetch('/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMessage = data.errors ? Object.values(data.errors).join(' ') : data.message || 'Unable to send your message.';
-        throw new Error(errorMessage);
+      if (!window.emailjs) {
+        throw new Error('EmailJS is not available right now.');
       }
 
-      status.textContent = data.message || 'Your message was sent successfully.';
+      await window.emailjs.sendForm('service_g8s5wc9', 'template_dka7t58', form);
+
+      status.textContent = '✅ Message sent successfully!';
       status.className = 'form-status success';
       form.reset();
     } catch (error) {
-      status.textContent = error.message || 'Unable to send your message right now.';
+      status.textContent = '❌ Failed to send message. Please try again.';
       status.className = 'form-status error';
     } finally {
       submitButton.disabled = false;
